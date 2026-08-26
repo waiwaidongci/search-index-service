@@ -64,7 +64,7 @@ func (m *Memory) CreateQueryTemplate(_ context.Context, f domain.QueryTemplate) 
 	if old, ok := m.templates[f.ID]; ok {
 		f.CreatedAt = old.CreatedAt
 	}
-	m.templates[f.ID] = f
+	m.templates[f.ID] = cloneQueryTemplate(f)
 	return nil
 }
 func (m *Memory) GetQueryTemplate(_ context.Context, id string) (domain.QueryTemplate, error) {
@@ -74,7 +74,7 @@ func (m *Memory) GetQueryTemplate(_ context.Context, id string) (domain.QueryTem
 	if !ok {
 		return domain.QueryTemplate{}, domain.ErrNotFound
 	}
-	return f, nil
+	return cloneQueryTemplate(f), nil
 }
 func (m *Memory) ListQueryTemplates(_ context.Context, p, e string) ([]domain.QueryTemplate, error) {
 	m.mu.RLock()
@@ -82,7 +82,7 @@ func (m *Memory) ListQueryTemplates(_ context.Context, p, e string) ([]domain.Qu
 	out := []domain.QueryTemplate{}
 	for _, f := range m.templates {
 		if f.SearchTenantID == p && (e == "" || f.IndexNamespaceID == e) {
-			out = append(out, f)
+			out = append(out, cloneQueryTemplate(f))
 		}
 	}
 	return out, nil
@@ -93,12 +93,12 @@ func (m *Memory) SaveTemplateRevision(_ context.Context, v domain.TemplateRevisi
 	arr := m.revisions[v.QueryTemplateID]
 	for i, x := range arr {
 		if x.Number == v.Number {
-			arr[i] = v
+			arr[i] = cloneTemplateRevision(v)
 			m.revisions[v.QueryTemplateID] = arr
 			return nil
 		}
 	}
-	m.revisions[v.QueryTemplateID] = append(arr, v)
+	m.revisions[v.QueryTemplateID] = append(arr, cloneTemplateRevision(v))
 	return nil
 }
 func (m *Memory) GetTemplateRevision(_ context.Context, id string, n int) (domain.TemplateRevision, error) {
@@ -106,7 +106,7 @@ func (m *Memory) GetTemplateRevision(_ context.Context, id string, n int) (domai
 	defer m.mu.RUnlock()
 	for _, v := range m.revisions[id] {
 		if v.Number == n {
-			return v, nil
+			return cloneTemplateRevision(v), nil
 		}
 	}
 	return domain.TemplateRevision{}, domain.ErrNotFound
@@ -114,7 +114,12 @@ func (m *Memory) GetTemplateRevision(_ context.Context, id string, n int) (domai
 func (m *Memory) ListTemplateRevisions(_ context.Context, id string) ([]domain.TemplateRevision, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	return append([]domain.TemplateRevision(nil), m.revisions[id]...), nil
+	src := m.revisions[id]
+	out := make([]domain.TemplateRevision, len(src))
+	for i, v := range src {
+		out[i] = cloneTemplateRevision(v)
+	}
+	return out, nil
 }
 func (m *Memory) SaveIndexPublication(_ context.Context, r domain.IndexPublication) error {
 	m.mu.Lock()

@@ -19,15 +19,24 @@ func CompareTemplateRevisions(a, b TemplateRevision) []Change {
 	if !reflect.DeepEqual(a.Value, b.Value) {
 		out = append(out, Change{Path: "value", Before: a.Value, After: b.Value, Kind: "changed"})
 	}
-	if len(a.Rules) != len(b.Rules) {
-		out = append(out, Change{Path: "rules", Before: len(a.Rules), After: len(b.Rules), Kind: "changed"})
+	la, lb := len(a.Rules), len(b.Rules)
+	if la != lb {
+		out = append(out, Change{Path: "rules", Before: la, After: lb, Kind: "changed"})
 	}
-	for i := range a.Rules {
-		if i >= len(b.Rules) {
-			break
-		}
-		if !reflect.DeepEqual(a.Rules[i], b.Rules[i]) {
-			out = append(out, Change{Path: "rules[" + itoa(i) + "]", Before: a.Rules[i], After: b.Rules[i], Kind: "changed"})
+	n := la
+	if lb > n {
+		n = lb
+	}
+	for i := 0; i < n; i++ {
+		switch {
+		case i >= la:
+			out = append(out, Change{Path: "rules[" + itoa(i) + "]", Before: nil, After: b.Rules[i], Kind: "added"})
+		case i >= lb:
+			out = append(out, Change{Path: "rules[" + itoa(i) + "]", Before: a.Rules[i], After: nil, Kind: "removed"})
+		default:
+			if !reflect.DeepEqual(a.Rules[i], b.Rules[i]) {
+				out = append(out, Change{Path: "rules[" + itoa(i) + "]", Before: a.Rules[i], After: b.Rules[i], Kind: "changed"})
+			}
 		}
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].Path < out[j].Path })

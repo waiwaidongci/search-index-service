@@ -30,7 +30,7 @@ func FilterQueryTemplates(templates []QueryTemplate, f QueryTemplateFilter) []Qu
 		if f.IndexNamespaceID != "" && item.IndexNamespaceID != f.IndexNamespaceID {
 			continue
 		}
-		out = append(out, item)
+		out = append(out, CopyQueryTemplate(item))
 	}
 	sort.SliceStable(out, func(i, j int) bool {
 		var less bool
