@@ -1,0 +1,4 @@
+http_addr: ":8083"
+environment: local
+shutdown_seconds: 10
+cache_ttl_seconds: 300
