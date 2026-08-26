@@ -8,7 +8,7 @@ import (
 
 func (s *Server) searchTenants(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.WriteHeader(405)
+		methodAllowed(w, "POST")
 		return
 	}
 	var v domain.SearchTenant
@@ -52,6 +52,10 @@ func (s *Server) queryTemplateRoutes(w http.ResponseWriter, r *http.Request) {
 		}
 		writeJSON(w, 201, o)
 	case "switch":
+		if r.Method != "POST" {
+			methodAllowed(w, "POST")
+			return
+		}
 		var in struct {
 			Revision    int    `json:"revision"`
 			NamespaceID string `json:"namespace_id"`

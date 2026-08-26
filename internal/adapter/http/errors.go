@@ -21,7 +21,7 @@ func respondError(w http.ResponseWriter, status int, code, message, requestID st
 }
 func methodAllowed(w http.ResponseWriter, methods ...string) {
 	w.Header().Set("Allow", joinMethods(methods))
-	w.WriteHeader(http.StatusMethodNotAllowed)
+	writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "method not allowed"})
 }
 func joinMethods(methods []string) string {
 	out := ""

@@ -9,7 +9,7 @@ import (
 
 func (s *Server) collections(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.WriteHeader(405)
+		methodAllowed(w, "POST")
 		return
 	}
 	var c domain.Collection
@@ -26,7 +26,7 @@ func (s *Server) collections(w http.ResponseWriter, r *http.Request) {
 }
 func (s *Server) documents(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.WriteHeader(405)
+		methodAllowed(w, "POST")
 		return
 	}
 	var d domain.Document
@@ -74,7 +74,7 @@ func (s *Server) searchTask(w http.ResponseWriter, r *http.Request) {
 }
 func (s *Server) searchQuery(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.WriteHeader(405)
+		methodAllowed(w, "POST")
 		return
 	}
 	var q domain.Query
@@ -91,7 +91,7 @@ func (s *Server) searchQuery(w http.ResponseWriter, r *http.Request) {
 }
 func (s *Server) rebuildIndex(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.WriteHeader(405)
+		methodAllowed(w, "POST")
 		return
 	}
 	var in struct {

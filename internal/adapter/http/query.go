@@ -2,6 +2,8 @@
 package httpadapter
 
 import (
+	"fmt"
+	"github.com/ali/go-0821/search-index-service/internal/domain"
 	"github.com/ali/go-0821/search-index-service/internal/infrastructure/config"
 	"net/http"
 	"strconv"
@@ -16,20 +18,31 @@ type Query struct {
 	Tags          map[string]string
 }
 
-func ParseQuery(r *http.Request) Query {
-	q := r.URL.Query()
-	page, _ := strconv.Atoi(q.Get("page"))
-	size, _ := strconv.Atoi(q.Get("size"))
-	return Query{ProjectID: strings.TrimSpace(q.Get("project_id")), EnvironmentID: strings.TrimSpace(q.Get("environment_id")), Page: page, Size: size, Tags: config.ParseTags(q.Get("tags"))}
+func ParseQuery(r *http.Request) (Query, error) {
+	q := Query{Tags: map[string]string{}}
+	v := r.URL.Query()
+	page, err := strconv.Atoi(v.Get("page"))
+	if err != nil && v.Get("page") != "" {
+		return q, fmt.Errorf("%w: invalid page parameter", domain.ErrInvalid)
+	}
+	size, err := strconv.Atoi(v.Get("size"))
+	if err != nil && v.Get("size") != "" {
+		return q, fmt.Errorf("%w: invalid size parameter", domain.ErrInvalid)
+	}
+	tags, err := config.ParseTags(v.Get("tags"))
+	if err != nil {
+		return q, fmt.Errorf("%w: invalid tags parameter", domain.ErrInvalid)
+	}
+	return Query{ProjectID: strings.TrimSpace(v.Get("project_id")), EnvironmentID: strings.TrimSpace(v.Get("environment_id")), Page: page, Size: size, Tags: tags}, nil
 }
-func boolQuery(r *http.Request, key string, def bool) bool {
+func boolQuery(r *http.Request, key string, def bool) (bool, error) {
 	v := r.URL.Query().Get(key)
 	if v == "" {
-		return def
+		return def, nil
 	}
 	b, e := strconv.ParseBool(v)
 	if e != nil {
-		return def
+		return false, fmt.Errorf("%w: invalid %s parameter", domain.ErrInvalid, key)
 	}
-	return b
+	return b, nil
 }
