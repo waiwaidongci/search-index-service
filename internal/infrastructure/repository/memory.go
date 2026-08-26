@@ -93,24 +93,33 @@ func (m *Memory) SaveTemplateRevision(_ context.Context, v domain.TemplateRevisi
 	arr := m.revisions[v.QueryTemplateID]
 	for i, x := range arr {
 		if x.Number == v.Number {
-			arr[i] = v
+			arr[i] = cloneTemplateRevision(v)
 			m.revisions[v.QueryTemplateID] = arr
 			return nil
 		}
 	}
-	m.revisions[v.QueryTemplateID] = append(arr, v)
+	m.revisions[v.QueryTemplateID] = append(arr, cloneTemplateRevision(v))
 	return nil
 }
 func (m *Memory) GetTemplateRevision(_ context.Context, id string, n int) (domain.TemplateRevision, error) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
 	for _, v := range m.revisions[id] {
 		if v.Number == n {
-			return v, nil
+			return cloneTemplateRevision(v), nil
 		}
 	}
 	return domain.TemplateRevision{}, domain.ErrNotFound
 }
 func (m *Memory) ListTemplateRevisions(_ context.Context, id string) ([]domain.TemplateRevision, error) {
-	return append([]domain.TemplateRevision(nil), m.revisions[id]...), nil
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	src := m.revisions[id]
+	out := make([]domain.TemplateRevision, len(src))
+	for i, v := range src {
+		out[i] = cloneTemplateRevision(v)
+	}
+	return out, nil
 }
 func (m *Memory) SaveIndexPublication(_ context.Context, r domain.IndexPublication) error {
 	m.mu.Lock()

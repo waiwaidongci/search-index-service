@@ -20,15 +20,21 @@ func (m *Memory) Get(_ context.Context, k string) (*domain.TemplateRevision, boo
 	if !ok {
 		return nil, false
 	}
-	return &v, true
+	out := clone(v)
+	return &out, true
 }
 func (m *Memory) Set(_ context.Context, k string, v domain.TemplateRevision) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	m.data[k] = v
+	m.data[k] = clone(v)
 }
 func (m *Memory) Delete(_ context.Context, k string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	delete(m.data, k)
+}
+
+func clone(v domain.TemplateRevision) domain.TemplateRevision {
+	v.Rules = domain.CloneRules(v.Rules)
+	return v
 }
