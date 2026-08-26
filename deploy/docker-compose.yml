@@ -1,0 +1,10 @@
+services:
+  search-index:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      SEARCH_INDEX_HTTP_ADDR: ":8083"
+      SEARCH_INDEX_ENVIRONMENT: docker
