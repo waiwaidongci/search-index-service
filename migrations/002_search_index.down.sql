@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS search_index_tasks;DROP TABLE IF EXISTS search_index_versions;DROP TABLE IF EXISTS search_document_changes;DROP TABLE IF EXISTS search_collections;DROP TABLE IF EXISTS search_tenants;
