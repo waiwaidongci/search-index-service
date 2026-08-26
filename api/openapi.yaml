@@ -1,0 +1,20 @@
+openapi: 3.0.3
+info:
+  title: Search Index Service
+  version: 1.0.0
+paths:
+  /healthz: {get: {responses: {'200': {description: healthy}}}}
+  /readyz: {get: {responses: {'200': {description: ready}}}}
+  /metrics: {get: {responses: {'200': {description: metrics}}}}
+  /v1/search/collections: {post: {summary: Create collection, responses: {'201': {description: collection created}, '409': {description: collection exists}}}}
+  /v1/search/documents: {post: {summary: Index document, responses: {'201': {description: document indexed}, '409': {description: stale version}}}}
+  /v1/search/query: {post: {summary: Search documents, responses: {'200': {description: search results}, '400': {description: invalid query}}}}
+  /v1/search/rebuild: {post: {summary: Rebuild collection index, responses: {'202': {description: rebuild accepted}}}}
+  /v1/search/tenants: {post: {summary: Create search tenant, responses: {'201': {description: tenant created}}}}
+  /v1/search/namespaces: {get: {summary: List index namespaces, responses: {'200': {description: namespaces}}}, post: {summary: Create namespace, responses: {'201': {description: namespace created}}}}
+  /v1/search/templates: {get: {summary: List query templates, responses: {'200': {description: templates}}}, post: {summary: Create query template, responses: {'201': {description: template created}}}}
+  /v1/search/documents/batch: {post: {summary: Batch index documents, responses: {'201': {description: documents indexed}}}}
+  /v1/search/documents/delete: {post: {summary: Delete indexed document, responses: {'200': {description: document deleted}}}}
+  /v1/search/tasks/{id}: {get: {summary: Get index task, responses: {'200': {description: task status}, '404': {description: task not found}}}}
+  /v1/search/templates/{id}/revisions: {get: {summary: List template revisions, responses: {'200': {description: revisions}}}, post: {summary: Create template revision, responses: {'201': {description: revision created}}}}
+  /v1/search/templates/{id}/switch: {post: {summary: Switch template revision, responses: {'200': {description: switched}}}}
