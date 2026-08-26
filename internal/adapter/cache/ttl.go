@@ -35,6 +35,7 @@ func (c *TTL) Get(_ context.Context, key string) (*domain.TemplateRevision, bool
 		return nil, false
 	}
 	v := e.revision
+	v.Rules = domain.CloneRules(v.Rules)
 	return &v, true
 }
 func (c *TTL) Set(_ context.Context, key string, v domain.TemplateRevision) {

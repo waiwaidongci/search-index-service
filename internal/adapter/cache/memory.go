@@ -20,6 +20,7 @@ func (m *Memory) Get(_ context.Context, k string) (*domain.TemplateRevision, boo
 	if !ok {
 		return nil, false
 	}
+	v.Rules = domain.CloneRules(v.Rules)
 	return &v, true
 }
 func (m *Memory) Set(_ context.Context, k string, v domain.TemplateRevision) {

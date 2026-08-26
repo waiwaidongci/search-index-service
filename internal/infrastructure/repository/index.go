@@ -20,7 +20,7 @@ func (i *QueryTemplateIndex) Add(f domain.QueryTemplate) {
 }
 func (i *QueryTemplateIndex) Remove(f domain.QueryTemplate) {
 	ids := i.bySearchTenant[f.SearchTenantID]
-	out := ids[:0]
+	out := make([]string, 0, len(ids))
 	for _, id := range ids {
 		if id != f.ID {
 			out = append(out, id)
