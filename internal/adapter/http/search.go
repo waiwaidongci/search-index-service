@@ -2,7 +2,6 @@
 package httpadapter
 
 import (
-	"context"
 	"github.com/ali/go-0821/search-index-service/internal/domain"
 	"net/http"
 	"strings"
@@ -50,7 +49,7 @@ func (s *Server) batchDocuments(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err)
 		return
 	}
-	o, err := s.search.BatchIndex(context.Background(), in.Documents, r.Header.Get("Idempotency-Key"))
+	o, err := s.search.BatchIndex(r.Context(), in.Documents, r.Header.Get("Idempotency-Key"))
 	if err != nil {
 		writeErr(w, err)
 		return
@@ -58,7 +57,7 @@ func (s *Server) batchDocuments(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, 201, map[string]any{"documents": o, "count": len(o)})
 }
 func (s *Server) deleteDocument(w http.ResponseWriter, r *http.Request) {
-	if err := s.search.Delete(context.Background(), r.URL.Query().Get("tenant_id"), r.URL.Query().Get("collection_id"), r.URL.Query().Get("id")); err != nil {
+	if err := s.search.Delete(r.Context(), r.URL.Query().Get("tenant_id"), r.URL.Query().Get("collection_id"), r.URL.Query().Get("id")); err != nil {
 		writeErr(w, err)
 		return
 	}
@@ -83,7 +82,7 @@ func (s *Server) searchQuery(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err)
 		return
 	}
-	o, err := s.search.Query(context.Background(), q)
+	o, err := s.search.Query(r.Context(), q)
 	if err != nil {
 		writeErr(w, err)
 		return
@@ -103,7 +102,7 @@ func (s *Server) rebuildIndex(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err)
 		return
 	}
-	o, err := s.search.Rebuild(context.Background(), in.TenantID, in.CollectionID)
+	o, err := s.search.Rebuild(r.Context(), in.TenantID, in.CollectionID)
 	if err != nil {
 		writeErr(w, err)
 		return

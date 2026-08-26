@@ -151,6 +151,9 @@ func (s *SearchService) Rebuild(ctx context.Context, tenant, collection string) 
 func (s *SearchService) BatchIndex(ctx context.Context, docs []domain.Document, idemPrefix string) ([]domain.Document, error) {
 	out := make([]domain.Document, 0, len(docs))
 	for i, d := range docs {
+		if err := ctx.Err(); err != nil {
+			return out, err
+		}
 		o, e := s.Index(ctx, d, fmt.Sprintf("%s-%d", idemPrefix, i))
 		if e != nil {
 			return nil, e
