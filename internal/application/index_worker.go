@@ -39,6 +39,9 @@ func (w *IndexWorker) Run(ctx context.Context, q ChangeQueue) error {
 				if last == nil {
 					break
 				}
+				if i == w.retry-1 {
+					break
+				}
 				select {
 				case <-ctx.Done():
 					return ctx.Err()
@@ -47,7 +50,7 @@ func (w *IndexWorker) Run(ctx context.Context, q ChangeQueue) error {
 			}
 			if last != nil {
 				_ = q.DeadLetter(ctx, d, last)
-				return nil
+				continue
 			}
 		}
 	}

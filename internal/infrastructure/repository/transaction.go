@@ -44,7 +44,7 @@ func WithTransaction(ctx context.Context, fn func(context.Context, *Transaction)
 	tx := NewTransaction()
 	if err := fn(ctx, tx); err != nil {
 		_ = tx.Rollback()
-		return nil
+		return err
 	}
 	return tx.Commit()
 }
